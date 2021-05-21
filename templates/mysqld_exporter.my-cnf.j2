@@ -1,0 +1,6 @@
+[client]
+  user={{ mysqld_exporter_mycnf_params.user }}
+  password={{ mysqld_exporter_mycnf_params.password }}
+{% if mysqld_exporter_mycnf_params.host != 'localhost' %}
+  host={{ mysqld_exporter_mycnf_params.host }}
+{% endif %}

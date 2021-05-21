@@ -1,0 +1,23 @@
+---
+
+mysqld_exporter_setup: full
+
+mysqld_exporter_version: 0.12.1
+mysqld_exporter_binary_url: https://github.com/prometheus/mysqld_exporter/releases/download/v{{ mysqld_exporter_version }}/mysqld_exporter-{{ mysqld_exporter_version }}.linux-amd64.tar.gz
+
+mysqld_exporter_config_file: mysqld_exporter.cfg
+mysqld_exporter_binary_name: mysqld_exporter
+mysqld_exporter_user_name: mysqld_exporter
+mysqld_exporter_service_name: mysqld_exporter
+mysqld_exporter_systemd_unit: "/etc/systemd/system/{{ mysqld_exporter_service_name }}.service"
+mysqld_exporter_dirs:
+  binary_dir: /usr/local/bin
+  config_dir: /usr/local/etc/mysqld_exporter
+
+mysqld_collector_flags: []
+
+mysqld_exporter_params: []
+mysqld_exporter_mycnf_params:
+  user: exporter
+  password: changeme
+  host: localhost

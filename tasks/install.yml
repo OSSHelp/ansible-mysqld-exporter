@@ -1,0 +1,59 @@
+---
+- name: create user
+  user:
+    name: "{{ mysqld_exporter_user_name }}"
+    home: "/nonexistent"
+    create_home: no
+    shell: "/bin/false"
+    system: yes
+
+- name: check if binary file exists
+  stat:
+    path: "{{ mysqld_exporter_dirs.binary_dir }}/{{ mysqld_exporter_binary_name }}"
+  register: binary_file
+
+- name: download and place binary
+  block:
+    - name: download and unarchive binary
+      unarchive:
+        src: "{{ mysqld_exporter_binary_url }}"
+        dest: /tmp
+        remote_src: yes
+    - name: copy binary
+      copy:
+        src: "/tmp/mysqld_exporter-{{ mysqld_exporter_version }}.linux-amd64/mysqld_exporter"
+        dest: "{{ mysqld_exporter_dirs.binary_dir }}/{{ mysqld_exporter_binary_name }}"
+        owner: root
+        group: root
+        mode: 0755
+        remote_src: yes
+  when: not binary_file.stat.exists
+
+- name: create systemd unit
+  template:
+    src: systemd-unit.j2
+    dest: "{{ mysqld_exporter_systemd_unit }}"
+  notify:
+    - reload mysqld_exporter unit
+    - restart mysqld_exporter service
+
+- name: ensure that configuration directory exists
+  file:
+    path: "{{ mysqld_exporter_dirs.config_dir }}"
+    state: directory
+
+- name: create exporter configuration file
+  template:
+    src: exporter-cfg.j2
+    dest: "{{ mysqld_exporter_dirs.config_dir }}/{{ mysqld_exporter_config_file }}"
+    owner: root
+    group: "{{ mysqld_exporter_user_name }}"
+    mode: 0640
+  notify: restart mysqld_exporter service
+
+- meta: flush_handlers
+
+- name: enable service
+  systemd:
+    name: "{{ mysqld_exporter_service_name }}"
+    enabled: true

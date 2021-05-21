@@ -1,0 +1,25 @@
+[Unit]
+Description=mysqld exporter
+
+[Service]
+Type=forking
+User={{ mysqld_exporter_user_name }}
+Group={{ mysqld_exporter_user_name }}
+RuntimeDirectory=mysqld_exporter
+RuntimeDirectoryMode=0755
+EnvironmentFile={{ mysqld_exporter_dirs.config_dir }}/{{ mysqld_exporter_config_file }}
+{% if ansible_distribution_release == 'focal' %}
+PIDFile=/run/mysqld_exporter/pid
+{% else %}
+PIDFile=/var/run/mysqld_exporter/pid
+{% endif %}
+ExecStart=/sbin/start-stop-daemon -Sbmp /var/run/mysqld_exporter/pid -x {{ mysqld_exporter_dirs.binary_dir }}/mysqld_exporter  -- --config.my-cnf=/usr/local/etc/mysqld_exporter/mysqld_exporter.my-cnf $MYSQLD_EXPORTER_PARAMS
+
+Restart=always
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=mysqld_exporter
+
+[Install]
+WantedBy=multi-user.target

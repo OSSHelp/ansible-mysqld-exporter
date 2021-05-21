@@ -1,0 +1,1 @@
+MYSQLD_EXPORTER_PARAMS="{% for flag in mysqld_collector_flags %} --{{ flag.key }} {{ flag.value }}{% endfor %}"

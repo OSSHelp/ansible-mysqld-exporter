@@ -1,0 +1,8 @@
+---
+- name: create exporter configuration file
+  template:
+    src: mysqld_exporter.my-cnf.j2
+    dest: "{{ mysqld_exporter_dirs.config_dir }}/mysqld_exporter.my-cnf"
+    owner: "{{ mysqld_exporter_user_name }}"
+    group: "{{ mysqld_exporter_user_name }}"
+    mode: 0640
